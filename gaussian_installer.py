@@ -1,12 +1,16 @@
 from os import mkdir, path, system, chdir, getcwd, listdir
 import tarfile
 from shutil import copy2
+from sys import argv
 import warnings
+
+from modules.utils import create_log
 
 # Ignorar todas las advertencias
 warnings.filterwarnings("ignore")
 
 # Configuración inicial
+# arch = argv[1]              # Archivo comprimido 
 system('clear')
 print('*' * 44)
 print('*** Iniciando la instalación de Gaussian ***')
@@ -71,7 +75,7 @@ try:
     # Extraer el archivo tar.gz
     try:
         print(f'*** Extrayendo archivo {arch} en {gaussian_path}... ***')
-        if arch.split('.')[-1] == 'gz':
+        if arch.split('.')[-1] == 'gz' or arch.split('.')[-1] == 'tgz':
             with tarfile.open(f'./versions/{arch}', 'r:gz') as file_gz:
                 file_gz.extractall(gaussian_path)
             print(f'*** Archivo {arch} extraído correctamente. ***')
@@ -96,14 +100,14 @@ try:
     try:
         chdir(home_dir)
         with open('.bashrc', 'a') as bashrc:
-            bashrc.write("\n# GAUSSIAN {version} VARIABLES\n")
+            bashrc.write(f"\n# GAUSSIAN {version} VARIABLES\n")
             bashrc.write(f"export g{version}root={gaussian_path}\n")
             bashrc.write(f"export GAUSS_SCRDIR=/tmp\n")
             bashrc.write(f". $g{version}root/g{version}/bsd/g{version}.profile\n")
     except FileNotFoundError:
         print('No se encontró el archivo .bashrc en el directorio home.')
         exit(1)
-
+    create_log(arch)
     print('-' * 55)
     print('¡Instalación terminada! Ejecuta los siguientes comandos:')
     print('  cd\n  . .bashrc')
